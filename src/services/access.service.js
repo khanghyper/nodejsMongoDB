@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const KeyTokenService = require('./keyToken.service');
 const { createTokenPair } = require('../auth/authUtils');
+const { getInfoData } = require('../utils');
 
 class AccessService {
 
@@ -27,7 +28,15 @@ class AccessService {
             if (user) {
                 // created privateKey, publicKey
                 const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-                    modulusLength: 4096
+                    modulusLength: 4096,
+                    publicKeyEncoding: {
+                        type: 'pkcs1',
+                        format: 'pem'
+                    },
+                    privateKeyEncoding: {
+                        type: 'pkcs1',
+                        format: 'pem'
+                    }
                 });
 
                 const publicKeyString = await KeyTokenService.createTokenKey({
@@ -42,20 +51,22 @@ class AccessService {
                     }
                 }
 
+                const publicKeyObject = crypto.createPublicKey(publicKeyString)
+
                 // create token pair
-                const tokens = await createTokenPair({userId: user._id, email}, publicKey, privateKey);
+                const tokens = await createTokenPair({ userId: user._id, email }, publicKeyObject, privateKey);
                 return {
                     code: 201,
                     data: {
-                        user,
+                        user: getInfoData(['_id,', 'name', 'email'], user),
                         tokens
                     }
                 }
             }
-        return {
-            code: 200,
-            data: null
-        }
+            return {
+                code: 200,
+                data: null
+            }
         } catch (error) {
             return {
                 code: 'abx',
