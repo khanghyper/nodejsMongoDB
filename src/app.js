@@ -2,11 +2,13 @@ const express = require('express');
 const morgan = require("morgan");
 const helmet = require("helmet");
 const compression = require('compression');
-
+const initRouter = require('./routes');
 
 const app = express();
 
 //init middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(compression());
@@ -17,11 +19,7 @@ const { checkOverLoad } = require('./helpers/check.connect');
 // checkOverLoad();
 
 //init routes
-app.get('/', (req, res) => {
-    return res.status(200).json({
-        message: 'hello world'
-    })
-})
+app.use('/', initRouter);
 
 //handle error
 
