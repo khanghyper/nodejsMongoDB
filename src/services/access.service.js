@@ -35,12 +35,7 @@ class AccessService {
                 });
 
 
-                if (!keyStore) {
-                    return {
-                        code: 'abx',
-                        message: 'keyStore error'
-                    }
-                }
+                if (!keyStore) throw new ApiError(StatusCodes.NOT_FOUND, 'Error: keys is not founded!');
 
                 // create token pair
                 const tokens = await createTokenPair({ userId: user._id, email }, publicKey, privateKey);
