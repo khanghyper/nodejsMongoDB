@@ -11,7 +11,7 @@ const router = express.Router();
 router.use(apiKey);
 
 //check permission
-router.use(permission('2'));
+router.use(permission('1'));
 
 router.use('/v1/api', accessRoute);
 

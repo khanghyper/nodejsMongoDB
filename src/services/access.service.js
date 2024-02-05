@@ -5,19 +5,16 @@ const crypto = require('crypto');
 const KeyTokenService = require('./keyToken.service');
 const { createTokenPair } = require('../auth/authUtils');
 const { getInfoData } = require('../utils');
+const ApiError = require('../core/error.response');
+const {StatusCodes} = require("http-status-codes");
 
 class AccessService {
 
     static signUp = async ({ name, email, password }) => {
-        try {
+        // try {
             const isUserExisted = await userModel.findOne({ email }).lean();
 
-            if (isUserExisted) {
-                return {
-                    code: 'abx',
-                    message: 'User is already existed!'
-                }
-            }
+            if (isUserExisted) throw new ApiError(StatusCodes.BAD_REQUEST, 'Error: User is already registed!');
 
             const passwordHashed = await bcrypt.hash(password, 10);
 
@@ -59,13 +56,13 @@ class AccessService {
                 code: 200,
                 data: null
             }
-        } catch (error) {
-            return {
-                code: 'abx',
-                message: error.message,
-                status: 'error'
-            }
-        }
+        // } catch (error) {
+        //     return {
+        //         code: 'abx',
+        //         message: error.message,
+        //         status: 'error'
+        //     }
+        // }
     }
 }
 

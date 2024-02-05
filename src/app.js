@@ -22,5 +22,14 @@ const { checkOverLoad } = require('./helpers/check.connect');
 app.use('/', initRouter);
 
 //handle error
+app.use((error, req, res, next) => {
+    const statusCode = error.statusCode || 500;
+    return res.status(statusCode).json({
+        status: 'error',
+        code: statusCode,
+        message: error.message || 'Internal Server Error!'
+    })
+}) 
+
 
 module.exports = app;
