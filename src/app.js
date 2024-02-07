@@ -24,6 +24,7 @@ app.use('/', initRouter);
 //handle error
 app.use((error, req, res, next) => {
     const statusCode = error.statusCode || 500;
+    console.log(error)
     return res.status(statusCode).json({
         status: 'error',
         code: statusCode,
