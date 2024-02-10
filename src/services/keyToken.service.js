@@ -4,6 +4,26 @@ const keyTokenModel = require('../models/keyToken.model');
 const {Types} = require('mongoose');
 
 class KeyTokenService {
+
+    static updateTokenByRefreshToken = async (refreshToken, newRefreshToken) => {
+        await keyTokenModel.updateOne({refreshToken: refreshToken}, {
+            $set: {
+                refreshToken: newRefreshToken
+            },
+            $addToSet: {
+                refreshTokensUsed: refreshToken
+            }
+        });
+    }
+
+    static findByRefreshTokenUsed = async (refreshToken) => {
+        return await keyTokenModel.findOne({refreshTokensUsed: refreshToken}).lean();
+    }
+
+    static findByRefreshToken = async (refreshToken) => {
+        return await keyTokenModel.findOne({refreshToken}).lean();
+    }
+
     static createTokenKey = async ({userId, publicKey, privateKey, refreshToken}) => {
         // const tokens = await keyTokenModel.create({
         //     user: userId,
@@ -28,6 +48,10 @@ class KeyTokenService {
             _id: new Types.ObjectId(id)
         })
         return result;
+    }
+
+    static deleteKeyById = async (userId) => {
+        return await keyTokenModel.deleteOne({user: userId});
     }
 }
 

@@ -1,8 +1,13 @@
 'use strict'
 
-const { signUp, login, logout } =  require('../services/access.service');
+const { signUp, login, logout, handleRefreshToken } =  require('../services/access.service');
 
 class AccessController {
+
+    handleRefreshToken = async (req, res, next) => {
+        const result = await handleRefreshToken(req.body.refreshToken);
+        return res.status(200).json(result);
+    }
 
     logout = async (req, res, next) => {
         const result = await logout(req.keyStore);

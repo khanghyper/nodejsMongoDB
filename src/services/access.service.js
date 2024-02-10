@@ -3,7 +3,7 @@ const userModel = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const KeyTokenService = require('./keyToken.service');
-const { createTokenPair } = require('../auth/authUtils');
+const { createTokenPair, verifyJWT} = require('../auth/authUtils');
 const { getInfoData, createPairKey} = require('../utils');
 const ApiError = require('../core/error.response');
 const {StatusCodes} = require("http-status-codes");
@@ -11,6 +11,49 @@ const {findByEmail} = require("./user.service");
 
 
 class AccessService {
+
+    static handleRefreshToken = async (refreshToken) => {
+        // check xem token nay da dc su dung chua
+        const foundToken = await KeyTokenService.findByRefreshTokenUsed(refreshToken);
+
+        // neu co
+        if(foundToken) {
+            //decode de kiem tra la` ai
+            const {userId, email } = await verifyJWT(refreshToken, foundToken.privateKey);
+
+            //xoa tat ca token trong keystore
+            await KeyTokenService.deleteKeyById(userId);
+            throw new ApiError(StatusCodes.FORBIDDEN, 'Error: Something with wrong! Please relogin!');
+        }
+        // khong
+        const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
+        if(!holderToken) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Error: User is not registed! 1');
+
+        // verify token
+        const {userId, email} = await verifyJWT(refreshToken, holderToken.privateKey);
+
+        //check Userid
+        const foundUser = await findByEmail({email});
+        if(!holderToken) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Error: User is not registed! 2');
+
+        // create 1 pair token moi
+        const tokens = await createTokenPair({userId, email}, holderToken.publicKey, holderToken.privateKey);
+
+        // update token
+        // await holderToken.update({
+        //     $set: {
+        //         refreshToken: tokens.refreshToken
+        //     },
+        //     $addToSet: {
+        //         refreshTokensUsed: refreshToken
+        //     }
+        // });
+        await KeyTokenService.updateTokenByRefreshToken(refreshToken, tokens.refreshToken);
+        return {
+            user: {userId, email},
+            tokens
+        }
+    }
 
     static logout = async (keyStore) => {
         const delKey = await KeyTokenService.removeTokenById(keyStore._id);
