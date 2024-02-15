@@ -17,7 +17,21 @@ const createPairKey = () =>{
     }
 }
 
+const getSortBy = (sort) =>{
+    const sortBy = {};
+    const properties = sort.split(",");
+
+    properties.forEach((property) => {
+        const key = property.replace(/^-/, "");
+        const value = property.startsWith("-") ? -1 : 1;
+        sortBy[key] = value;
+    });
+
+    return sortBy;
+}
+
 module.exports = {
     getInfoData,
-    createPairKey
+    createPairKey,
+    getSortBy
 }

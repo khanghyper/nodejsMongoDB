@@ -43,6 +43,9 @@ const bookSchema = new Schema({
     timestamps: true
 });
 
+// create index for search
+bookSchema.index({book_name: 'text', book_description: 'text'});
+
 
 module.exports = {
     book: model(DOCUMENT_NAME, bookSchema)

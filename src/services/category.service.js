@@ -22,6 +22,10 @@ class CategoryService{
     static getCategories = async () => {
         return await category.find({}).lean();
     }
+
+    static findCategoryById = async (id) => {
+        return await category.findOne({_id: id});
+    }
 }
 
 module.exports = CategoryService;
