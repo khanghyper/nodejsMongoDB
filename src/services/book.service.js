@@ -27,6 +27,8 @@ class BookService {
         return await book.create({book_name, book_thumb, book_images, book_description, book_price, book_quantity, book_category});
     }
 
+
+
     static foundBookByName = async (book_name) => {
         return await book.findOne({book_name});
     }
@@ -50,6 +52,18 @@ class BookService {
                 .lean()
                 .exec()
         }
+    }
+
+    static deleteBook = async (id) => {
+        const delBook = await book.findOneAndDelete({_id: id});
+        if(!delBook) throw new ApiError(StatusCodes.NOT_FOUND, 'Error: Book is not found!');
+        return {message: 'Delete book successfully!'};
+    }
+
+    static updateBook = async ({id, payload}) => {
+        const updBook = await book.findOneAndUpdate({_id: id}, {$set: payload});
+        if(!updBook) throw new ApiError(StatusCodes.NOT_FOUND, 'Error: Book is not found!');
+        return {message: 'Update book successfully!'};
     }
 
     static getBookById = async (id) => {

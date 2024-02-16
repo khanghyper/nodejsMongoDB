@@ -30,6 +30,10 @@ const getSortBy = (sort) =>{
     return sortBy;
 }
 
+const getPrice = (minPrice, maxPrice) => {
+    
+}
+
 module.exports = {
     getInfoData,
     createPairKey,

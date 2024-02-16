@@ -33,6 +33,14 @@ class BookController {
             data: await BookService.searchProducts(req.query.keySearch)
         })
     }
+
+    static delBook = async (req, res, next) => {
+        return res.status(200).json(await BookService.deleteBook(req.params.id));
+    }
+
+    static updateBook = async (req, res, next) => {
+        return res.status(200).json(await BookService.updateBook({id: req.params.id, payload: req.body}));
+    }
 }
 
 module.exports = BookController;
